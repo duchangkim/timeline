@@ -8,7 +8,9 @@
     "format": "prettier --write 'src/**/*.{js,jsx,ts,tsx,json,css,scss,md}'",
     "preview": "vite preview",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build"
+    "build-storybook": "storybook build",
+    "dev:core": "yarn workspace @duchi-timeline/core dev",
+    "dev:demo": "yarn workspace @duchi-timeline/demo dev"
   },
   "workspaces": [
     "packages/*"
@@ -44,7 +46,8 @@
     "storybook": "^8.1.5",
     "storybook-dark-mode": "^4.0.1",
     "typescript": "^5.2.2",
-    "vite": "^5.2.0"
+    "vite": "^5.2.0",
+    "vite-plugin-dts": "^3.9.1"
   },
   "packageManager": "yarn@4.2.2+sha224.1e50daf19e5e249a025569752c60b88005fddf57d10fcde5fc68b88f"
 }
