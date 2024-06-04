@@ -18,4 +18,10 @@ export default defineConfig({
     },
     // https://ko.vitejs.dev/guide/build.html#library-mode
   },
+  resolve: {
+    alias: {
+      '@': path.resolve(__dirname, './src'),
+    },
+    extensions: ['.ts', '.js'],
+  },
 });
