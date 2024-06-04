@@ -1,10 +1,24 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import reactLogo from './assets/react.svg';
+import viteLogo from '/vite.svg';
+import './App.css';
+import { Calendar } from '@duchi-timeline/core';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const dayCalendar = new Calendar({ timeScale: 'day' });
+
+  console.log(dayCalendar.makeCells());
+
+  const handlePrevious = () => {
+    dayCalendar.getPreviousCells();
+    console.log(dayCalendar.getCells());
+  };
+
+  const handleNext = () => {
+    dayCalendar.getNextCells();
+    console.log(dayCalendar.getCells());
+  };
 
   return (
     <>
@@ -18,9 +32,11 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
+        <button onClick={handlePrevious}>Previous</button>
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
+        <button onClick={handleNext}>Next</button>
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>
@@ -29,7 +45,7 @@ function App() {
         Click on the Vite and React logos to learn more
       </p>
     </>
-  )
+  );
 }
 
-export default App
+export default App;
