@@ -1,3 +1,4 @@
+import { CalendarCells } from '@/calendar/CalendarCells';
 import type { TimeScale } from '@/time/models';
 import type { Dayjs } from 'dayjs';
 
@@ -30,7 +31,9 @@ export type CalendarMeta = SubCalendarMeta | MainCalendarMeta;
 
 export interface CalendarData {
   meta: CalendarMeta;
-  cells: CalendarCell[];
+  range: CalendarRange;
+  currentDate: Dayjs;
+  cells: CalendarCells;
 }
 
 export interface CalendarRange {

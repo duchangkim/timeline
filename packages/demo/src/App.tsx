@@ -2,23 +2,13 @@ import { useState } from 'react';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
-import { Calendar } from '@duchi-timeline/core';
+import { CalendarBuilder } from '@duchi-timeline/core';
 
 function App() {
   const [count, setCount] = useState(0);
-  const dayCalendar = new Calendar({ timeScale: 'day' });
+  const calendarData = new CalendarBuilder().setRange().build();
 
-  console.log(dayCalendar.makeCells());
-
-  const handlePrevious = () => {
-    dayCalendar.getPreviousCells();
-    console.log(dayCalendar.getCells());
-  };
-
-  const handleNext = () => {
-    dayCalendar.getNextCells();
-    console.log(dayCalendar.getCells());
-  };
+  console.log(calendarData);
 
   return (
     <>
@@ -32,11 +22,11 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={handlePrevious}>Previous</button>
+        {/* <button onClick={handlePrevious}>Previous</button> */}
         <button onClick={() => setCount((count) => count + 1)}>
           count is {count}
         </button>
-        <button onClick={handleNext}>Next</button>
+        {/* <button onClick={handleNext}>Next</button> */}
         <p>
           Edit <code>src/App.tsx</code> and save to test HMR
         </p>

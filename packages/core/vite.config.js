@@ -16,6 +16,7 @@ export default defineConfig({
       name: 'TimelineCore', // 라이브러리 이름
       fileName: (format) => `@duchi-timeline-core.${format}.js`, // 출력 파일 이름
     },
+    sourcemap: true,
     // https://ko.vitejs.dev/guide/build.html#library-mode
   },
   resolve: {
