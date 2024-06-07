@@ -10,7 +10,27 @@ export class CalendarCells {
     return this.#cells;
   }
 
-  getCellsByRange({
+  constructor({
+    range,
+    timeScale,
+    now,
+  }: {
+    range: CalendarRange;
+    timeScale: TimeScale;
+    now: Dayjs;
+  }) {
+    this.getCellsByRange({ range, timeScale, now });
+  }
+
+  #getTimeScaleUnit(timeScale: TimeScale) {
+    if (timeScale === TIME_SCALE.WEEK || timeScale === TIME_SCALE.QUARTER) {
+      return 'day';
+    }
+
+    return timeScale;
+  }
+
+  public getCellsByRange({
     range,
     timeScale,
     now,
@@ -37,13 +57,5 @@ export class CalendarCells {
     this.#cells = cells;
 
     return this.cells;
-  }
-
-  #getTimeScaleUnit(timeScale: TimeScale) {
-    if (timeScale === TIME_SCALE.WEEK || timeScale === TIME_SCALE.QUARTER) {
-      return 'day';
-    }
-
-    return timeScale;
   }
 }

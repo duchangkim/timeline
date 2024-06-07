@@ -3,6 +3,14 @@ import { CalendarData, CalendarMeta, CalendarRange } from '@/calendar/models';
 import { DEFAULT_RANGE_BY_TIME_SCALE, TIME_SCALE } from '@/time/constants';
 import dayjs, { Dayjs } from 'dayjs';
 
+const DEFAULT_RANGE = () => ({
+  start: dayjs(),
+  end: dayjs(),
+  amountHours: 0,
+});
+
+// TODO: Need validation
+
 export class CalendarBuilder {
   #calendarData: CalendarData = {
     meta: {
@@ -10,13 +18,13 @@ export class CalendarBuilder {
       timeScale: TIME_SCALE.HOUR,
       isSubCalendar: false,
     },
-    range: {
-      start: dayjs(),
-      end: dayjs(),
-      amountHours: 0,
-    },
+    range: DEFAULT_RANGE(),
     currentDate: dayjs(),
-    cells: new CalendarCells(),
+    cells: new CalendarCells({
+      range: DEFAULT_RANGE(),
+      timeScale: TIME_SCALE.HOUR,
+      now: dayjs(),
+    }),
   };
 
   public setMeta(calendarMeta: CalendarMeta) {
@@ -39,7 +47,13 @@ export class CalendarBuilder {
   }
 
   public setCells() {
-    this.#calendarData.cells = new CalendarCells();
+    this.#calendarData.cells = new CalendarCells({
+      range: this.#calendarData.range,
+      timeScale: this.#calendarData.meta.timeScale,
+      now: this.#calendarData.currentDate,
+    });
+
+    return this;
   }
 
   public build() {
