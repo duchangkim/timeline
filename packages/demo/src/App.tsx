@@ -6,26 +6,29 @@ import { Calendar, CalendarBuilder } from '@duchi-timeline/core';
 
 function App() {
   const [count, setCount] = useState(0);
-  const calendarData = new CalendarBuilder()
-    .setMeta({
-      currentDate: new Date(),
-      timeScale: 'day',
-      isSubCalendar: false,
-    })
-    .setRange()
-    .setCells()
-    .build();
-  const calendarManager = new Calendar(calendarData);
-  console.log(calendarManager.mainCalendar?.cells.cells);
+  const [mainCalendar, setMainCalendar] = useState(
+    new CalendarBuilder()
+      .setMeta({
+        currentDate: new Date(),
+        timeScale: 'day',
+        isSubCalendar: false,
+      })
+      .setRange()
+      .setCells()
+      .build(),
+  );
+
+  const calendarManager = new Calendar(mainCalendar);
+  console.log(calendarManager.mainCalendar?.cells);
 
   const handlePrevious = () => {
-    calendarManager.attachPreviousCells();
-    console.log(calendarManager.mainCalendar?.cells.cells);
+    setMainCalendar(calendarManager.attachPreviousCells().mainCalendar);
+    console.log(mainCalendar);
   };
 
   const handleNext = () => {
-    calendarManager.attachNextCells();
-    console.log(calendarManager.mainCalendar?.cells.cells);
+    setMainCalendar(calendarManager.attachNextCells().mainCalendar);
+    console.log(mainCalendar);
   };
 
   return (
@@ -39,6 +42,11 @@ function App() {
         </a>
       </div>
       <h1>Vite + React</h1>
+      <div className="calendar-wrap">
+        {mainCalendar.cells.map((cell) => (
+          <div className="calendar-cell">{cell.formattedDate}</div>
+        ))}
+      </div>
       <div className="card">
         <button onClick={handlePrevious}>Previous</button>
         <button onClick={() => setCount((count) => count + 1)}>

@@ -40,3 +40,25 @@
 .read-the-docs {
   color: #888;
 }
+
+.calendar-wrap {
+  display: flex;
+  overflow-x: auto;
+  max-width: 300px;
+  padding-bottom: 40px;
+  border: 1px solid darkgrey;
+  border-radius: 4px;
+}
+
+.calendar-cell {
+  box-sizing: border-box;
+  flex-shrink: 0;
+  width: 30px;
+  padding: 0 6px;
+  border-left: 1px solid darkgrey;
+  border-bottom: 1px solid darkgrey;
+
+  &:first-child {
+    border-left: none;
+  }
+}
