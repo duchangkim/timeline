@@ -1,4 +1,5 @@
 import type { CalendarData, CalendarRange } from '@/calendar/models';
+import { CalendarCells } from '@/public-api';
 
 export class Calendar {
   #mainCalendar: CalendarData | null = null;
@@ -17,110 +18,179 @@ export class Calendar {
     }
   }
 
-  get mainCalendar(): CalendarData | null {
-    return this.#mainCalendar;
+  get mainCalendar(): CalendarData {
+    return this.#mainCalendar!;
   }
 
   get subCalendar(): CalendarData | null {
     return this.#subCalendar;
   }
 
-  // range, cells 관리
-  public adjustStartRange(amountHours: number): void {
-    if (!this.mainCalendar || !this.#mainCalendar) {
+  private adjustRange(
+    range: CalendarRange,
+    amountHours: number,
+    adjustType: 'start' | 'end',
+  ): CalendarRange {
+    const newDate =
+      adjustType === 'start'
+        ? amountHours < 0
+          ? range.start.add(amountHours, 'hour')
+          : range.start.subtract(amountHours, 'hour')
+        : amountHours < 0
+          ? range.end.subtract(amountHours, 'hour')
+          : range.end.add(amountHours, 'hour');
+
+    return {
+      ...range,
+      [adjustType]: newDate,
+    };
+  }
+
+  public adjustStartRange(amountHours: number): Calendar {
+    if (!this.mainCalendar) {
       throw new Error('Main calendar is not defined');
     }
 
-    const startDate = this.mainCalendar.range.start;
-    const adjustedCalendarRange: CalendarRange = {
-      ...this.mainCalendar.range,
-      start:
-        amountHours < 0
-          ? startDate.add(amountHours, 'hour')
-          : startDate.subtract(amountHours, 'hour'),
-    };
+    const newRange = this.adjustRange(
+      this.mainCalendar.range,
+      amountHours,
+      'start',
+    );
 
-    this.#mainCalendar.range = adjustedCalendarRange;
+    const adjustedMainCalendar = {
+      ...this.mainCalendar,
+      range: newRange,
+    };
 
     console.log(
       'start',
-      this.#mainCalendar.range.start.format('YYYY-MM-DD HH:mm'),
+      adjustedMainCalendar.range.start.format('YYYY-MM-DD HH:mm'),
     );
 
-    console.log('end', this.#mainCalendar.range.end.format('YYYY-MM-DD HH:mm'));
+    console.log(
+      'end',
+      adjustedMainCalendar.range.end.format('YYYY-MM-DD HH:mm'),
+    );
 
-    if (this.#subCalendar) {
-      this.#subCalendar.range = adjustedCalendarRange;
+    if (this.subCalendar) {
+      return new Calendar({
+        mainCalendar: adjustedMainCalendar,
+        subCalendar: {
+          ...this.subCalendar,
+          range: newRange,
+        },
+      });
     }
+
+    return new Calendar(adjustedMainCalendar);
   }
 
-  public adjustEndRange(amountHours: number): void {
-    if (!this.mainCalendar || !this.#mainCalendar) {
+  public adjustEndRange(amountHours: number): Calendar {
+    if (!this.mainCalendar) {
       throw new Error('Main calendar is not defined');
     }
 
-    const endDate = this.mainCalendar.range.end;
-    const adjustedCalendarRange: CalendarRange = {
-      ...this.mainCalendar.range,
-      end:
-        amountHours < 0
-          ? endDate.subtract(amountHours, 'hour')
-          : endDate.add(amountHours, 'hour'),
+    const newRange = this.adjustRange(
+      this.mainCalendar.range,
+      amountHours,
+      'end',
+    );
+
+    const adjustedMainCalendar = {
+      ...this.mainCalendar,
+      range: newRange,
     };
 
-    this.#mainCalendar.range = adjustedCalendarRange;
     console.log(
       'start',
-      this.#mainCalendar.range.start.format('YYYY-MM-DD HH:mm'),
+      adjustedMainCalendar.range.start.format('YYYY-MM-DD HH:mm'),
     );
 
-    console.log('end', this.#mainCalendar.range.end.format('YYYY-MM-DD HH:mm'));
+    console.log(
+      'end',
+      adjustedMainCalendar.range.end.format('YYYY-MM-DD HH:mm'),
+    );
 
-    if (this.#subCalendar) {
-      this.#subCalendar.range = adjustedCalendarRange;
+    if (this.subCalendar) {
+      return new Calendar({
+        mainCalendar: adjustedMainCalendar,
+        subCalendar: {
+          ...this.subCalendar,
+          range: newRange,
+        },
+      });
     }
+
+    return new Calendar(adjustedMainCalendar);
   }
 
-  // main sub 모두 동시에 컨트롤
-  public attachPreviousCells() {
-    if (!this.mainCalendar || !this.#mainCalendar) {
+  public attachPreviousCells(): Calendar {
+    if (!this.mainCalendar) {
       throw new Error('Main calendar is not defined');
     }
 
-    this.adjustStartRange(-this.mainCalendar.range.amountHours);
-    this.mainCalendar.cells.getCellsByRange({
-      range: this.mainCalendar.range,
-      timeScale: this.mainCalendar.meta.timeScale,
-      now: this.mainCalendar.currentDate,
-    });
+    const newCalendar = this.adjustStartRange(
+      -this.mainCalendar.range.amountHours,
+    );
 
-    if (this.#subCalendar) {
-      this.#subCalendar.cells.getCellsByRange({
-        range: this.#subCalendar.range,
-        timeScale: this.#subCalendar.meta.timeScale,
-        now: this.#subCalendar.currentDate,
+    const updatedMainCalendar: CalendarData = {
+      ...newCalendar.mainCalendar,
+      cells: new CalendarCells({
+        range: newCalendar.mainCalendar.range,
+        timeScale: newCalendar.mainCalendar.meta.timeScale,
+        now: newCalendar.mainCalendar.currentDate,
+      }).cells,
+    };
+
+    if (newCalendar.subCalendar) {
+      return new Calendar({
+        mainCalendar: updatedMainCalendar,
+        subCalendar: {
+          ...newCalendar.subCalendar,
+          cells: new CalendarCells({
+            range: newCalendar.subCalendar.range,
+            timeScale: newCalendar.subCalendar.meta.timeScale,
+            now: newCalendar.subCalendar.currentDate,
+          }).cells,
+        },
       });
     }
+
+    return new Calendar(updatedMainCalendar);
   }
 
-  public attachNextCells() {
-    if (!this.mainCalendar || !this.#mainCalendar) {
+  public attachNextCells(): Calendar {
+    if (!this.mainCalendar) {
       throw new Error('Main calendar is not defined');
     }
 
-    this.adjustEndRange(this.mainCalendar.range.amountHours);
-    this.mainCalendar.cells.getCellsByRange({
-      range: this.mainCalendar.range,
-      timeScale: this.mainCalendar.meta.timeScale,
-      now: this.mainCalendar.currentDate,
-    });
+    const newCalendar = this.adjustEndRange(
+      this.mainCalendar.range.amountHours,
+    );
 
-    if (this.#subCalendar) {
-      this.#subCalendar.cells.getCellsByRange({
-        range: this.#subCalendar.range,
-        timeScale: this.#subCalendar.meta.timeScale,
-        now: this.#subCalendar.currentDate,
+    const updatedMainCalendar: CalendarData = {
+      ...newCalendar.mainCalendar,
+      cells: new CalendarCells({
+        range: newCalendar.mainCalendar.range,
+        timeScale: newCalendar.mainCalendar.meta.timeScale,
+        now: newCalendar.mainCalendar.currentDate,
+      }).cells,
+    };
+
+    if (newCalendar.subCalendar) {
+      return new Calendar({
+        mainCalendar: updatedMainCalendar,
+        subCalendar: {
+          ...newCalendar.subCalendar,
+          cells: new CalendarCells({
+            range: newCalendar.subCalendar.range,
+            timeScale: newCalendar.subCalendar.meta.timeScale,
+            now: newCalendar.subCalendar.currentDate,
+          }).cells,
+        },
       });
     }
+
+    return new Calendar(updatedMainCalendar);
   }
 }

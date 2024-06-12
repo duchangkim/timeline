@@ -19,7 +19,7 @@ export class CalendarCells {
     timeScale: TimeScale;
     now: Dayjs;
   }) {
-    this.getCellsByRange({ range, timeScale, now });
+    this.#getCellsByRange({ range, timeScale, now });
   }
 
   #getTimeScaleUnit(timeScale: TimeScale) {
@@ -30,7 +30,7 @@ export class CalendarCells {
     return timeScale;
   }
 
-  public getCellsByRange({
+  #getCellsByRange({
     range,
     timeScale,
     now,
@@ -46,7 +46,8 @@ export class CalendarCells {
     while (range.end.isAfter(currentDate, timeScaleUnit)) {
       cells.push({
         date: currentDate.toDate(),
-        formattedDate: currentDate.get(timeScaleUnit),
+        // TODO format을 받을 수 있도록 수정 필요
+        formattedDate: currentDate.locale('en').format('D'),
         isCurrent: currentDate.isSame(now, timeScaleUnit),
         isWeekend: [0, 6].includes(currentDate.day()),
       });

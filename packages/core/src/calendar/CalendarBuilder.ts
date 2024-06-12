@@ -22,7 +22,7 @@ export class CalendarBuilder {
       range: DEFAULT_RANGE(),
       timeScale: TIME_SCALE.HOUR,
       now: dayjs(),
-    }),
+    }).cells,
   };
 
   public setMeta(calendarMeta: CalendarMeta) {
@@ -69,7 +69,7 @@ export class CalendarBuilder {
       range: this.#calendarData.range,
       timeScale: this.#calendarData.meta.timeScale,
       now: this.#calendarData.currentDate,
-    });
+    }).cells;
 
     return this;
   }
@@ -97,7 +97,7 @@ export class CalendarBuilder {
         range: this.#calendarData.range,
         timeScale: this.#calendarData.meta.timeScale,
         now: this.#calendarData.currentDate,
-      });
+      }).cells;
     }
 
     return this.#calendarData;
